@@ -1,27 +1,20 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
-mongoose.connect(
-  "mongodb+srv://admin:nida1984@cluster0.cs7tw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+const userSchema = new mongoose.Schema({
+  fullName: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
   }
-);
+  next();
+});
 
-let ContactModel;
-try {
-  ContactModel = mongoose.model("contact");
-} catch (error) {
-  console.log("Creating new 'contact' model");
-  ContactModel = mongoose.model(
-    "contact",
-    new mongoose.Schema({
-      name: String,
-      email: String,
-      subject: String,
-      message: String,
-    })
-  );
-}
-
-module.exports = ContactModel;
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+export default User;
