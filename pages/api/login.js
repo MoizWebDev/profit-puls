@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import User from "../../../Models/User";
+import User from "../../Models/User";
 
 // Connect to MongoDB
 mongoose.connect("mongodb://localhost:27017/profitpuls", {
